@@ -58,10 +58,24 @@ void insertMap(HashMap * map, char * key, void * value) {
 
 
 void enlarge(HashMap * map) {
-    enlarge_called = 1; //no borrar (testing purposes)
+    Pair ** old_buckets = map->buckets;   // a) guardamos el arreglo antiguo
+    long old_capacity = map->capacity;
 
+    map->capacity *= 2;                    // b) duplicamos la capacidad
+    map->buckets = (Pair **) calloc(map->capacity, sizeof(Pair *)); // c) nuevo arreglo
+    map->size = 0;                         // d) reiniciamos tamaño
+    map->current = -1;
 
+    // e) reinsertamos todos los pares válidos del arreglo antiguo
+    for (long i = 0; i < old_capacity; i++) {
+        if (old_buckets[i] != NULL && old_buckets[i]->key != NULL) {
+            insertMap(map, old_buckets[i]->key, old_buckets[i]->value);
+        }
+    }
+
+    free(old_buckets); // liberamos el arreglo antiguo
 }
+
 
 
 HashMap * createMap(long capacity) {
