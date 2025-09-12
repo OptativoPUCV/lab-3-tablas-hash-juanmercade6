@@ -42,15 +42,20 @@ int is_equal(void* key1, void* key2){
 void insertMap(HashMap * map, char * key, void * value) {
     long pos = hash(key, map->capacity);
 
+    // avanzar hasta encontrar una casilla disponible
     while (map->buckets[pos] != NULL && map->buckets[pos]->key != NULL) {
-        if (is_equal(map->buckets[pos]->key, key)) return; // clave repetida
+        // si la clave ya existe, no insertar
+        if (is_equal(map->buckets[pos]->key, key)) return;
+
         pos = (pos + 1) % map->capacity; // avanzar circular
     }
 
+    // insertar par nuevo en la posición encontrada
     map->buckets[pos] = createPair(key, value);
     map->current = pos;
     map->size++;
 }
+
 
 void enlarge(HashMap * map) {
     enlarge_called = 1; //no borrar (testing purposes)
@@ -68,15 +73,25 @@ HashMap * createMap(long capacity) {
     return map;
 }
 
+
 void eraseMap(HashMap * map,  char * key) {    
 
 
 }
 
-Pair * searchMap(HashMap * map,  char * key) {   
+Pair * searchMap(HashMap * map, char * key) {
+    long pos = hash(key, map->capacity);
 
+    // recorrer hasta encontrar la clave o una casilla nula
+    while (map->buckets[pos] != NULL) {
+        if (map->buckets[pos]->key != NULL && is_equal(map->buckets[pos]->key, key)) {
+            map->current = pos;
+            return map->buckets[pos];
+        }
+        pos = (pos + 1) % map->capacity; // avanzar circular
+    }
 
-    return NULL;
+    return NULL; // clave no encontrada
 }
 
 Pair * firstMap(HashMap * map) {
